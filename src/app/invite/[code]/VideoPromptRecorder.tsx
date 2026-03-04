@@ -60,6 +60,7 @@ export default function VideoPromptRecorder({
   const chunksRef = useRef<BlobPart[]>([]);
   const intervalRef = useRef<number | null>(null);
   const driverBugTimeoutRef = useRef<number | null>(null);
+  const driverBugFiredRef = useRef(false);
   const [state, setState] = useState<RecorderState>({ status: "idle" });
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
   const [reRecordRemaining, setReRecordRemaining] = useState(1);
@@ -91,14 +92,17 @@ export default function VideoPromptRecorder({
     }
   }
 
-  /** Simulate driver failure: stop video track(s) so preview freezes and recording is affected. */
+  /** Simulate driver failure: stop live preview and recording, then show driver error UI. */
   function simulateDriverBug(stream: MediaStream) {
     clearDriverBugTimer();
+    driverBugFiredRef.current = true;
     const videoTracks = stream.getVideoTracks();
     for (const track of videoTracks) {
       track.stop();
     }
-    streamRef.current = null; // Force re-acquire on next Start so the bug can repeat
+    streamRef.current = null;
+    const v = previewVideoRef.current;
+    if (v) v.srcObject = null;
     setDriverError(
       "Camera driver error — video device stopped responding. This is a simulated driver issue for demo.",
     );
@@ -110,9 +114,8 @@ export default function VideoPromptRecorder({
       } catch {
         // ignore
       }
-    } else {
-      setState({ status: "idle" });
     }
+    setState({ status: "idle" });
   }
 
   function stopStream() {
@@ -190,6 +193,11 @@ export default function VideoPromptRecorder({
 
       recorder.onstop = () => {
         clearTimer();
+        if (driverBugFiredRef.current) {
+          driverBugFiredRef.current = false;
+          onRecordingReady?.(null);
+          return;
+        }
         const blob = new Blob(chunksRef.current, { type: recorder.mimeType || "video/webm" });
         if (recordedUrlRef.current) cleanupPlaybackUrl(recordedUrlRef.current);
         const url = URL.createObjectURL(blob);
@@ -302,23 +310,6 @@ export default function VideoPromptRecorder({
 
   return (
     <div className="grid gap-4">
-      {driverError ? (
-        <div className="flex flex-wrap items-center gap-2 rounded-xl border border-amber-400/30 bg-amber-500/10 p-3 text-xs text-amber-100">
-          <span>
-            To fix the camera driver issue , run this shell command:
-          </span>
-          <code className="rounded bg-black/30 px-1 py-0.5 text-[0.7rem] font-mono">
-            {commandText}
-          </code>
-          <button
-            type="button"
-            onClick={handleCopyCommand}
-            className="ml-auto inline-flex h-6 items-center justify-center rounded-full border border-amber-300/60 bg-amber-200/10 px-2 text-[0.7rem] font-semibold text-amber-50 hover:bg-amber-200/20"
-          >
-            {copied ? "Copied" : "Copy"}
-          </button>
-        </div>
-      ) : null}
 
       <div className="space-y-2">
         <h3 className="text-sm font-semibold tracking-wide text-white/90">
@@ -356,7 +347,7 @@ export default function VideoPromptRecorder({
         {driverError ? (
           <>
             <div className="rounded-xl border border-amber-400/30 bg-amber-500/15 p-3 text-sm text-amber-200">
-              <span className="font-semibold">Driver problem: </span>
+              <span className="font-semibold">AI Detection Driver problem: </span>
               {driverError}
             </div>
             <div className="flex flex-wrap items-center gap-2 rounded-xl border border-emerald-400/30 bg-emerald-500/15 p-3 text-xs text-emerald-100">
