@@ -818,7 +818,7 @@ export default function QuestionnaireForm({ inviteCode }: Props) {
         </a>
         <button
           type="submit"
-          disabled={submitState.status === "submitting" || !previewOk}
+          disabled
           className="inline-flex h-10 items-center justify-center rounded-full bg-white px-6 text-sm font-semibold text-neutral-950 transition hover:bg-white/90 disabled:cursor-not-allowed disabled:opacity-70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40"
         >
           {submitState.status === "submitting" ? "Submitting…" : "Submit"}
