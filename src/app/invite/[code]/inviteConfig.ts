@@ -16,7 +16,7 @@ export function getQuestionnaireType(code: string): QuestionnaireType {
 export function getPageTitle(code: string): string {
   const type = getQuestionnaireType(code);
   if (type === "technical")
-    return "Online Questionnaire: Blockchain / Crypto Technical Specialist";
+    return "Online Questionnaire";
   if (type === "professional") return "Online Questionnaire";
   return "Online Questionnaire";
 }
