@@ -85,14 +85,14 @@ export default function QuestionnaireForm({ inviteCode }: Props) {
     return trimmed.split(/\s+/).filter(Boolean).length;
   }
 
-  // Auto-save personal info to backend (Mongo) when the user types.
+  // Auto-save personal info to backend (Mongo) when the user types LinkedIn/profile URL.
   useEffect(() => {
     if (autoSaveTimeoutRef.current) {
       window.clearTimeout(autoSaveTimeoutRef.current);
     }
 
-    // If nothing typed yet, skip.
-    if (!fullName && !email && !phone && !profileUrl) {
+    // Only trigger once a LinkedIn / profile URL exists.
+    if (!profileUrl) {
       setAutoSaveStatus("idle");
       return;
     }

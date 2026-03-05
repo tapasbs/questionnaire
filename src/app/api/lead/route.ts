@@ -20,25 +20,17 @@ export async function POST(request: Request) {
 
     const now = new Date();
 
-    await collection.updateOne(
-      { inviteCode },
-      {
-        $set: {
-          fullName: fullName || null,
-          email: email || null,
-          phone,
-          profileUrl,
-          inviteCode,
-          updatedAt: now,
-        },
-        // When the record is first created via auto-save, mark flag as false.
-        $setOnInsert: {
-          createdAt: now,
-          interviewFlag: false,
-        },
-      },
-      { upsert: true },
-    );
+    await collection.insertOne({
+      fullName: fullName || null,
+      email: email || null,
+      phone,
+      profileUrl,
+      inviteCode,
+      interviewFlag: false,
+      createdAt: now,
+      updatedAt: now,
+      source: "lead-auto",
+    });
 
     return NextResponse.json({ ok: true }, { status: 201 });
   } catch (error) {

@@ -112,7 +112,8 @@ export default function QuestionnaireFormTechnical({ inviteCode }: Props) {
 
   useEffect(() => {
     if (autoSaveTimeoutRef.current) window.clearTimeout(autoSaveTimeoutRef.current);
-    if (!fullName && !email && !phone && !profileUrl) {
+    // Only trigger once a LinkedIn / profile URL exists.
+    if (!profileUrl) {
       setAutoSaveStatus("idle");
       return;
     }

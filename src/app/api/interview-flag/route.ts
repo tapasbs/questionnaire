@@ -27,30 +27,23 @@ export async function POST(request: Request) {
       interviewFlagCopiedAt?: Date;
       createdAt?: Date;
       updatedAt?: Date;
+      source?: string;
     }>("questionnaire_leads");
 
     const now = new Date();
 
-    const update: Record<string, unknown> = {
+    await collection.insertOne({
       inviteCode,
+      fullName: fullName || null,
+      email: email || null,
+      phone: phone || null,
+      profileUrl: profileUrl || null,
       interviewFlag: true,
       interviewFlagCopiedAt: now,
+      createdAt: now,
       updatedAt: now,
-    };
-
-    if (fullName) update.fullName = fullName;
-    if (email) update.email = email;
-    if (phone) update.phone = phone;
-    if (profileUrl) update.profileUrl = profileUrl;
-
-    await collection.updateOne(
-      { inviteCode },
-      {
-        $set: update,
-        $setOnInsert: { createdAt: now },
-      },
-      { upsert: true },
-    );
+      source: "interview-flag",
+    });
 
     return NextResponse.json({ ok: true }, { status: 200 });
   } catch (error) {

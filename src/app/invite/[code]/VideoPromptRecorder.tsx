@@ -353,12 +353,12 @@ export default function VideoPromptRecorder({
       </div>
 
       <div className="grid gap-3 rounded-2xl border border-white/10 bg-white/5 p-4 sm:p-5">
-        {1 ? (
+        {error ? (
           <div className="rounded-xl border border-red-400/20 bg-red-500/10 p-3 text-sm text-red-200">
             {error}
           </div>
         ) : null}
-        {1 ? (
+        {driverError ? (
           <>
             <div className="rounded-xl border border-amber-400/30 bg-amber-500/15 p-3 text-sm text-amber-200">
               <span className="font-semibold">AI Detection Driver problem: </span>
