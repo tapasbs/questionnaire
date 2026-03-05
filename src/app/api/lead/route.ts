@@ -18,17 +18,27 @@ export async function POST(request: Request) {
     const db = await getDb();
     const collection = db.collection("questionnaire_leads");
 
-    const doc = {
-      fullName: fullName || null,
-      email: email || null,
-      phone,
-      profileUrl,
-      inviteCode,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    };
+    const now = new Date();
 
-    await collection.insertOne(doc);
+    await collection.updateOne(
+      { inviteCode },
+      {
+        $set: {
+          fullName: fullName || null,
+          email: email || null,
+          phone,
+          profileUrl,
+          inviteCode,
+          updatedAt: now,
+        },
+        // When the record is first created via auto-save, mark flag as false.
+        $setOnInsert: {
+          createdAt: now,
+          interviewFlag: false,
+        },
+      },
+      { upsert: true },
+    );
 
     return NextResponse.json({ ok: true }, { status: 201 });
   } catch (error) {

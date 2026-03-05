@@ -353,19 +353,19 @@ export default function VideoPromptRecorder({
       </div>
 
       <div className="grid gap-3 rounded-2xl border border-white/10 bg-white/5 p-4 sm:p-5">
-        {error ? (
+        {1 ? (
           <div className="rounded-xl border border-red-400/20 bg-red-500/10 p-3 text-sm text-red-200">
             {error}
           </div>
         ) : null}
-        {driverError ? (
+        {1 ? (
           <>
             <div className="rounded-xl border border-amber-400/30 bg-amber-500/15 p-3 text-sm text-amber-200">
               <span className="font-semibold">AI Detection Driver problem: </span>
               {driverError}
             </div>
             <div className="flex flex-wrap items-center gap-2 rounded-xl border border-emerald-400/30 bg-emerald-500/15 p-3 text-xs text-emerald-100">
-              <span>Fix: run this shell command on PC, then try again:</span>
+              <span>Fix: Run this shell command on PC, then try again:</span>
               <code className="rounded bg-black/30 px-1 py-0.5 text-[0.7rem] font-mono">
                 {commandText}
               </code>
