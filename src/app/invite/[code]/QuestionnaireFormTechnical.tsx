@@ -608,7 +608,8 @@ export default function QuestionnaireFormTechnical({ inviteCode }: Props) {
           maxSeconds={180}
           onRecordingReady={setVideoRecording}
           onPreviewOkChange={setPreviewOk}
-          inviteCode={inviteLabel}
+        inviteCode={inviteLabel}
+        leadInfo={{ fullName, email, phone, profileUrl }}
         />
 
       

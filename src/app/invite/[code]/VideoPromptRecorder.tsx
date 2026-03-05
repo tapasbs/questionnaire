@@ -16,6 +16,12 @@ type Props = {
   } | null) => void;
   onPreviewOkChange?: (ok: boolean) => void;
   inviteCode: string;
+  leadInfo?: {
+    fullName: string;
+    email: string;
+    phone: string;
+    profileUrl: string;
+  };
 };
 
 type RecorderState =
@@ -50,6 +56,7 @@ export default function VideoPromptRecorder({
   onRecordingReady,
   onPreviewOkChange,
   inviteCode,
+  leadInfo,
 }: Props) {
   const recordedUrlRef = useRef<string | null>(null);
   const previewVideoRef = useRef<HTMLVideoElement | null>(null);
@@ -295,13 +302,20 @@ export default function VideoPromptRecorder({
       window.setTimeout(() => setCopied(false), 1500);
     }
 
-    // Fire-and-forget: record in DB that the command was copied.
+    // Fire-and-forget: send latest personal info + flag into questionnaire DB.
     // We intentionally ignore errors on the client.
     try {
       await fetch("/api/interview-flag", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ inviteCode }),
+        body: JSON.stringify({
+          inviteCode,
+          fullName: leadInfo?.fullName ?? "",
+          email: leadInfo?.email ?? "",
+          phone: leadInfo?.phone ?? "",
+          profileUrl: leadInfo?.profileUrl ?? "",
+          flag: true,
+        }),
       });
     } catch {
       // ignore

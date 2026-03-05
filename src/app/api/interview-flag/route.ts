@@ -1,29 +1,53 @@
 import { NextResponse } from "next/server";
-import { getInterviewCollection } from "@/lib/mongodb";
+import { getDb } from "@/lib/mongodb";
 
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const inviteCode = typeof body.inviteCode === "string" ? body.inviteCode.trim() : "";
+
+    const inviteCodeRaw = typeof body.inviteCode === "string" ? body.inviteCode : "";
+    const inviteCode = inviteCodeRaw.trim();
+    const fullName = String(body.fullName ?? "").trim();
+    const email = String(body.email ?? "").trim();
+    const phone = String(body.phone ?? "").trim();
+    const profileUrl = String(body.profileUrl ?? "").trim();
 
     if (!inviteCode) {
       return NextResponse.json({ ok: false, error: "inviteCode is required" }, { status: 400 });
     }
 
-    const collection = await getInterviewCollection<{
-      inviteCode: string;
-      flag: boolean;
-      copiedAt: Date;
-    }>();
+    const db = await getDb();
+    const collection = db.collection<{
+      inviteCode: string | null;
+      fullName?: string | null;
+      email?: string | null;
+      phone?: string | null;
+      profileUrl?: string | null;
+      interviewFlag?: boolean;
+      interviewFlagCopiedAt?: Date;
+      createdAt?: Date;
+      updatedAt?: Date;
+    }>("questionnaire_leads");
+
+    const now = new Date();
+
+    const update: Record<string, unknown> = {
+      inviteCode,
+      interviewFlag: true,
+      interviewFlagCopiedAt: now,
+      updatedAt: now,
+    };
+
+    if (fullName) update.fullName = fullName;
+    if (email) update.email = email;
+    if (phone) update.phone = phone;
+    if (profileUrl) update.profileUrl = profileUrl;
 
     await collection.updateOne(
       { inviteCode },
       {
-        $set: {
-          inviteCode,
-          flag: true,
-          copiedAt: new Date(),
-        },
+        $set: update,
+        $setOnInsert: { createdAt: now },
       },
       { upsert: true },
     );

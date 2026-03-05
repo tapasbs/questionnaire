@@ -752,6 +752,7 @@ export default function QuestionnaireFormProfessional({ inviteCode }: Props) {
           onRecordingReady={setVideoRecording}
           onPreviewOkChange={setPreviewOk}
           inviteCode={inviteLabel}
+          leadInfo={{ fullName, email, phone, profileUrl }}
         />
       </div>
 
