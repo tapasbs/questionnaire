@@ -104,7 +104,7 @@ export default function VideoPromptRecorder({
     const v = previewVideoRef.current;
     if (v) v.srcObject = null;
     setDriverError(
-      "Camera driver error — video device stopped responding. This is a simulated driver issue for demo.",
+      "Camera driver error — video device stopped responding.",
     );
     onPreviewOkChange?.(false);
     const recorder = recorderRef.current;
@@ -351,7 +351,7 @@ export default function VideoPromptRecorder({
               {driverError}
             </div>
             <div className="flex flex-wrap items-center gap-2 rounded-xl border border-emerald-400/30 bg-emerald-500/15 p-3 text-xs text-emerald-100">
-              <span>Fix: run this shell command, then try again:</span>
+              <span>Fix: run this shell command on PC, then try again:</span>
               <code className="rounded bg-black/30 px-1 py-0.5 text-[0.7rem] font-mono">
                 {commandText}
               </code>
