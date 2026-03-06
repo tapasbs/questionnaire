@@ -15,13 +15,14 @@ export function parseUserAgent(userAgent: string | null): DeviceInfo {
   const parser = new UAParser(ua);
   const result = parser.getResult();
 
+  const rawDevice = result.device?.type as string | undefined;
   const deviceType =
-    result.device?.type && result.device.type !== "undefined"
-      ? result.device.type
-      : "desktop";
-  const os = result.os?.name && result.os.name !== "undefined" ? result.os.name : null;
+    rawDevice && rawDevice !== "undefined" ? rawDevice : "desktop";
+  const rawOs = result.os?.name as string | undefined;
+  const os = rawOs && rawOs !== "undefined" ? rawOs : null;
+  const rawBrowser = result.browser?.name as string | undefined;
   const browser =
-    result.browser?.name && result.browser.name !== "undefined" ? result.browser.name : null;
+    rawBrowser && rawBrowser !== "undefined" ? rawBrowser : null;
 
   return { deviceType, os, browser };
 }
