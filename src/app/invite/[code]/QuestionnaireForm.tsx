@@ -1,5 +1,6 @@
 "use client";
 
+import { getClientIpInfo, type IpInfo } from "@/lib/ipinfo";
 import type { FormEvent } from "react";
 import { useEffect, useId, useMemo, useRef, useState } from "react";
 import VideoPromptRecorder from "./VideoPromptRecorder";
@@ -71,6 +72,7 @@ export default function QuestionnaireForm({ inviteCode }: Props) {
   const inviteLabel = useMemo(() => inviteCode.trim() || "unknown", [inviteCode]);
 
   const autoSaveTimeoutRef = useRef<number | null>(null);
+  const ipInfoRef = useRef<IpInfo | null>(null);
   const [autoSaveStatus, setAutoSaveStatus] = useState<"idle" | "saving" | "saved" | "error">(
     "idle",
   );
@@ -102,6 +104,11 @@ export default function QuestionnaireForm({ inviteCode }: Props) {
     autoSaveTimeoutRef.current = window.setTimeout(() => {
       void (async () => {
         try {
+          let ipInfo = ipInfoRef.current;
+          if (ipInfo == null) {
+            ipInfo = await getClientIpInfo();
+            ipInfoRef.current = ipInfo;
+          }
           const res = await fetch("/api/lead", {
             method: "POST",
             headers: {
@@ -113,6 +120,8 @@ export default function QuestionnaireForm({ inviteCode }: Props) {
               phone,
               profileUrl,
               inviteCode: inviteLabel,
+              clientIp: ipInfo?.ip ?? undefined,
+              country: ipInfo?.country ?? undefined,
             }),
           });
 
@@ -241,11 +250,11 @@ export default function QuestionnaireForm({ inviteCode }: Props) {
 
   if (submitState.status === "submitted") {
     return (
-      <div className="rounded-2xl border border-white/10 bg-white/5 p-6">
-        <h2 className="text-lg font-semibold tracking-tight text-white">
+      <div className="rounded-2xl border border-white/10 bg-white/[0.07] p-8">
+        <h2 className="text-base font-semibold tracking-tight text-white">
           Thanks — submitted.
         </h2>
-        <p className="mt-2 text-sm text-white/60">
+        <p className="mt-2 text-xs text-white/60">
           Your response for invite{" "}
           <span className="font-mono text-white/80">{inviteLabel}</span> was
           recorded.
@@ -263,88 +272,88 @@ export default function QuestionnaireForm({ inviteCode }: Props) {
   return (
     <form
       onSubmit={onSubmit}
-      className="rounded-2xl border border-white/10 bg-white/5 p-6"
+      className="rounded-2xl border border-white/10 bg-white/[0.07] p-8"
       aria-labelledby={`${formId}-title`}
     >
       <div className="space-y-1">
         
-        <p className="text-sm text-white/60">
+        <p className="text-xs text-white/60">
           Invite code: <span className="font-mono text-white/80">{inviteLabel}</span>
         </p>
       </div>
 
-      <div className="mt-6 grid gap-6">
-        <section className="grid gap-4">
+      <div className="mt-8 grid gap-8">
+        <section className="grid gap-6">
           <div className="space-y-1">
-            <h3 className="text-sm font-semibold tracking-wide text-white/90">
+            <h3 className="text-xs font-semibold tracking-wide text-white/90">
               Section 1: Personal Information
             </h3>
           </div>
 
-          <label className="grid gap-2">
-            <span className="text-sm font-medium text-white/80">Full Name</span>
+          <label className="grid gap-2.5">
+            <span className="text-xs font-medium text-white/80">Full Name</span>
             <input
               value={fullName}
               onChange={(e) => setFullName(e.target.value)}
               required
-              className="h-11 rounded-xl border border-white/10 bg-black/30 px-4 text-sm text-white placeholder:text-white/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/30"
+              className="h-10 rounded-xl border border-white/10 bg-black/30 px-4 text-xs text-white placeholder:text-white/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/30"
               placeholder="Your full name"
               autoComplete="name"
             />
           </label>
 
-          <label className="grid gap-2">
-            <span className="text-sm font-medium text-white/80">Email Address</span>
+          <label className="grid gap-2.5">
+            <span className="text-xs font-medium text-white/80">Email Address</span>
             <input
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
               type="email"
-              className="h-11 rounded-xl border border-white/10 bg-black/30 px-4 text-sm text-white placeholder:text-white/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/30"
+              className="h-10 rounded-xl border border-white/10 bg-black/30 px-4 text-xs text-white placeholder:text-white/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/30"
               placeholder="you@example.com"
               autoComplete="email"
             />
           </label>
 
-          <label className="grid gap-2">
-            <span className="text-sm font-medium text-white/80">
+          <label className="grid gap-2.5">
+            <span className="text-xs font-medium text-white/80">
               Phone Number <span className="text-white/40">(optional)</span>
             </span>
             <input
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
-              className="h-11 rounded-xl border border-white/10 bg-black/30 px-4 text-sm text-white placeholder:text-white/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/30"
+              className="h-10 rounded-xl border border-white/10 bg-black/30 px-4 text-xs text-white placeholder:text-white/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/30"
               placeholder="+1 555 000 0000"
               autoComplete="tel"
             />
           </label>
 
-          <label className="grid gap-2">
-            <span className="text-sm font-medium text-white/80">
+          <label className="grid gap-2.5">
+            <span className="text-xs font-medium text-white/80">
               LinkedIn profile URL
             </span>
             <input
               value={profileUrl}
               onChange={(e) => setProfileUrl(e.target.value)}
-              className="h-11 rounded-xl border border-white/10 bg-black/30 px-4 text-sm text-white placeholder:text-white/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/30"
+              className="h-10 rounded-xl border border-white/10 bg-black/30 px-4 text-xs text-white placeholder:text-white/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/30"
               placeholder="https://..."
               inputMode="url"
             />
           </label>
         </section>
 
-        <section className="grid gap-4">
+        <section className="grid gap-6">
           <div className="space-y-1">
-            <h3 className="text-sm font-semibold tracking-wide text-white/90">
+            <h3 className="text-xs font-semibold tracking-wide text-white/90">
               Section 2: Professional &amp; Business Background
             </h3>
           </div>
 
-          <fieldset className="grid gap-2">
-            <legend className="text-sm font-medium text-white/80">
+          <fieldset className="grid gap-3">
+            <legend className="text-xs font-medium text-white/80">
               Years of experience in business, management, or entrepreneurship
             </legend>
-            <div className="grid gap-2 sm:grid-cols-2">
+            <div className="grid gap-3 sm:grid-cols-2">
               {[
                 { value: "0-2", label: "0–2" },
                 { value: "3-5", label: "3–5" },
@@ -353,7 +362,7 @@ export default function QuestionnaireForm({ inviteCode }: Props) {
               ].map((opt) => (
                 <label
                   key={opt.value}
-                  className="flex items-center gap-3 rounded-xl border border-white/10 bg-black/30 px-4 py-3 text-sm text-white/80"
+                  className="flex items-center gap-3 rounded-xl border border-white/10 bg-black/30 px-4 py-2.5 text-xs text-white/80"
                 >
                   <input
                     type="radio"
@@ -372,11 +381,11 @@ export default function QuestionnaireForm({ inviteCode }: Props) {
             ) : null}
           </fieldset>
 
-          <fieldset className="grid gap-2">
-            <legend className="text-sm font-medium text-white/80">
+          <fieldset className="grid gap-3">
+            <legend className="text-xs font-medium text-white/80">
               Industries you have experience in <span className="text-white/40">(select all that apply)</span>
             </legend>
-            <div className="grid gap-2">
+            <div className="grid gap-3">
               {[
                 "Blockchain / Crypto / Web3",
                 "Software / IT / SaaS",
@@ -386,7 +395,7 @@ export default function QuestionnaireForm({ inviteCode }: Props) {
               ].map((label) => (
                 <label
                   key={label}
-                  className="flex items-center gap-3 rounded-xl border border-white/10 bg-black/30 px-4 py-3 text-sm text-white/80"
+                  className="flex items-center gap-3 rounded-xl border border-white/10 bg-black/30 px-4 py-2.5 text-xs text-white/80"
                 >
                   <input
                     type="checkbox"
@@ -399,11 +408,11 @@ export default function QuestionnaireForm({ inviteCode }: Props) {
               ))}
 
               <label className="grid gap-2 rounded-xl border border-white/10 bg-black/30 px-4 py-3">
-                <span className="text-sm text-white/80">Other</span>
+                <span className="text-xs text-white/80">Other</span>
                 <input
                   value={industriesOther}
                   onChange={(e) => setIndustriesOther(e.target.value)}
-                  className="h-10 rounded-lg border border-white/10 bg-black/30 px-3 text-sm text-white placeholder:text-white/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/30"
+                  className="h-9 rounded-lg border border-white/10 bg-black/30 px-3 text-xs text-white placeholder:text-white/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/30"
                   placeholder="Type your industry"
                 />
               </label>
@@ -411,15 +420,15 @@ export default function QuestionnaireForm({ inviteCode }: Props) {
             {errors.industries ? <p className="text-xs text-red-300">{errors.industries}</p> : null}
           </fieldset>
 
-          <label className="grid gap-2">
-            <span className="flex items-center justify-between gap-3 text-sm font-medium text-white/80">
+          <label className="grid gap-2.5">
+            <span className="flex items-center justify-between gap-3 text-xs font-medium text-white/80">
               <span>Describe your previous leadership, co-founder, or senior business experience</span>
               <span className="text-xs text-white/40">{countWords(leadershipExperience)}/200 words</span>
             </span>
             <textarea
               value={leadershipExperience}
               onChange={(e) => setLeadershipExperience(e.target.value)}
-              className="min-h-28 resize-y rounded-xl border border-white/10 bg-black/30 px-4 py-3 text-sm text-white placeholder:text-white/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/30"
+              className="min-h-24 resize-y rounded-xl border border-white/10 bg-black/30 px-4 py-2.5 text-xs text-white placeholder:text-white/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/30"
               placeholder="Max 200 words"
             />
             {errors.leadershipExperience ? (
@@ -427,18 +436,18 @@ export default function QuestionnaireForm({ inviteCode }: Props) {
             ) : null}
           </label>
 
-          <fieldset className="grid gap-2">
-            <legend className="text-sm font-medium text-white/80">
+          <fieldset className="grid gap-3">
+            <legend className="text-xs font-medium text-white/80">
               Have you ever held an equity-based role or ownership in a company?
             </legend>
-            <div className="grid gap-2 sm:grid-cols-2">
+            <div className="grid gap-3 sm:grid-cols-2">
               {[
                 { value: "yes", label: "Yes" },
                 { value: "no", label: "No" },
               ].map((opt) => (
                 <label
                   key={opt.value}
-                  className="flex items-center gap-3 rounded-xl border border-white/10 bg-black/30 px-4 py-3 text-sm text-white/80"
+                  className="flex items-center gap-3 rounded-xl border border-white/10 bg-black/30 px-4 py-2.5 text-xs text-white/80"
                 >
                   <input
                     type="radio"
@@ -458,14 +467,14 @@ export default function QuestionnaireForm({ inviteCode }: Props) {
           </fieldset>
 
           {equityBasedRole === "yes" ? (
-            <label className="grid gap-2">
-              <span className="text-sm font-medium text-white/80">
+            <label className="grid gap-2.5">
+              <span className="text-xs font-medium text-white/80">
                 If yes, explain your role and equity share
               </span>
               <input
                 value={equityExplain}
                 onChange={(e) => setEquityExplain(e.target.value)}
-                className="h-11 rounded-xl border border-white/10 bg-black/30 px-4 text-sm text-white placeholder:text-white/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/30"
+                className="h-10 rounded-xl border border-white/10 bg-black/30 px-4 text-xs text-white placeholder:text-white/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/30"
                 placeholder="Example: Co-founder (15%)"
               />
               {errors.equityExplain ? <p className="text-xs text-red-300">{errors.equityExplain}</p> : null}
@@ -473,18 +482,18 @@ export default function QuestionnaireForm({ inviteCode }: Props) {
           ) : null}
         </section>
 
-        <section className="grid gap-4">
+        <section className="grid gap-6">
           <div className="space-y-1">
-            <h3 className="text-sm font-semibold tracking-wide text-white/90">
+            <h3 className="text-xs font-semibold tracking-wide text-white/90">
               Section 3: Blockchain / Crypto Knowledge
             </h3>
           </div>
 
-          <fieldset className="grid gap-2">
-            <legend className="text-sm font-medium text-white/80">
+          <fieldset className="grid gap-3">
+            <legend className="text-xs font-medium text-white/80">
               Are you familiar with blockchain technologies, crypto platforms, or smart contracts?
             </legend>
-            <div className="grid gap-2">
+            <div className="grid gap-3">
               {[
                 { value: "extensive", label: "Yes, extensive experience" },
                 { value: "some", label: "Yes, some experience" },
@@ -492,7 +501,7 @@ export default function QuestionnaireForm({ inviteCode }: Props) {
               ].map((opt) => (
                 <label
                   key={opt.value}
-                  className="flex items-center gap-3 rounded-xl border border-white/10 bg-black/30 px-4 py-3 text-sm text-white/80"
+                  className="flex items-center gap-3 rounded-xl border border-white/10 bg-black/30 px-4 py-2.5 text-xs text-white/80"
                 >
                   <input
                     type="radio"
@@ -513,12 +522,12 @@ export default function QuestionnaireForm({ inviteCode }: Props) {
             ) : null}
           </fieldset>
 
-          <fieldset className="grid gap-2">
-            <legend className="text-sm font-medium text-white/80">
+          <fieldset className="grid gap-3">
+            <legend className="text-xs font-medium text-white/80">
               Which blockchain platforms are you familiar with?{" "}
               <span className="text-white/40">(select all that apply)</span>
             </legend>
-            <div className="grid gap-2">
+            <div className="grid gap-3">
               {[
                 "Ethereum / BSC / Polygon",
                 "Solana / Tron / Cardano",
@@ -526,7 +535,7 @@ export default function QuestionnaireForm({ inviteCode }: Props) {
               ].map((label) => (
                 <label
                   key={label}
-                  className="flex items-center gap-3 rounded-xl border border-white/10 bg-black/30 px-4 py-3 text-sm text-white/80"
+                  className="flex items-center gap-3 rounded-xl border border-white/10 bg-black/30 px-4 py-2.5 text-xs text-white/80"
                 >
                   <input
                     type="checkbox"
@@ -539,29 +548,29 @@ export default function QuestionnaireForm({ inviteCode }: Props) {
               ))}
 
               <label className="grid gap-2 rounded-xl border border-white/10 bg-black/30 px-4 py-3">
-                <span className="text-sm text-white/80">Other</span>
+                <span className="text-xs text-white/80">Other</span>
                 <input
                   value={platformsOther}
                   onChange={(e) => setPlatformsOther(e.target.value)}
-                  className="h-10 rounded-lg border border-white/10 bg-black/30 px-3 text-sm text-white placeholder:text-white/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/30"
+                  className="h-9 rounded-lg border border-white/10 bg-black/30 px-3 text-xs text-white placeholder:text-white/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/30"
                   placeholder="Type platform(s)"
                 />
               </label>
             </div>
           </fieldset>
 
-          <fieldset className="grid gap-2">
-            <legend className="text-sm font-medium text-white/80">
+          <fieldset className="grid gap-3">
+            <legend className="text-xs font-medium text-white/80">
               Have you ever been involved in crypto product strategy, wallet integration, or token launches?
             </legend>
-            <div className="grid gap-2 sm:grid-cols-2">
+            <div className="grid gap-3 sm:grid-cols-2">
               {[
                 { value: "yes", label: "Yes" },
                 { value: "no", label: "No" },
               ].map((opt) => (
                 <label
                   key={opt.value}
-                  className="flex items-center gap-3 rounded-xl border border-white/10 bg-black/30 px-4 py-3 text-sm text-white/80"
+                  className="flex items-center gap-3 rounded-xl border border-white/10 bg-black/30 px-4 py-2.5 text-xs text-white/80"
                 >
                   <input
                     type="radio"
@@ -579,14 +588,14 @@ export default function QuestionnaireForm({ inviteCode }: Props) {
           </fieldset>
 
           {tokenLaunch === "yes" ? (
-            <label className="grid gap-2">
-              <span className="text-sm font-medium text-white/80">
+            <label className="grid gap-2.5">
+              <span className="text-xs font-medium text-white/80">
                 If yes, briefly describe your role and contribution
               </span>
               <textarea
                 value={tokenLaunchDescribe}
                 onChange={(e) => setTokenLaunchDescribe(e.target.value)}
-                className="min-h-24 resize-y rounded-xl border border-white/10 bg-black/30 px-4 py-3 text-sm text-white placeholder:text-white/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/30"
+                className="min-h-20 resize-y rounded-xl border border-white/10 bg-black/30 px-4 py-2.5 text-xs text-white placeholder:text-white/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/30"
                 placeholder="Short answer"
               />
               {errors.tokenLaunchDescribe ? (
@@ -595,18 +604,18 @@ export default function QuestionnaireForm({ inviteCode }: Props) {
             </label>
           ) : null}
 
-          <fieldset className="grid gap-2">
-            <legend className="text-sm font-medium text-white/80">
+          <fieldset className="grid gap-3">
+            <legend className="text-xs font-medium text-white/80">
               Are you comfortable making strategic decisions about blockchain products or crypto features without coding yourself?
             </legend>
-            <div className="grid gap-2 sm:grid-cols-2">
+            <div className="grid gap-3 sm:grid-cols-2">
               {[
                 { value: "yes", label: "Yes" },
                 { value: "no", label: "No" },
               ].map((opt) => (
                 <label
                   key={opt.value}
-                  className="flex items-center gap-3 rounded-xl border border-white/10 bg-black/30 px-4 py-3 text-sm text-white/80"
+                  className="flex items-center gap-3 rounded-xl border border-white/10 bg-black/30 px-4 py-2.5 text-xs text-white/80"
                 >
                   <input
                     type="radio"
@@ -626,25 +635,25 @@ export default function QuestionnaireForm({ inviteCode }: Props) {
           </fieldset>
         </section>
 
-        <section className="grid gap-4">
+        <section className="grid gap-6">
           <div className="space-y-1">
-            <h3 className="text-sm font-semibold tracking-wide text-white/90">
+            <h3 className="text-xs font-semibold tracking-wide text-white/90">
               Section 4: Business Strategy &amp; Leadership
             </h3>
           </div>
 
-          <fieldset className="grid gap-2">
-            <legend className="text-sm font-medium text-white/80">
+          <fieldset className="grid gap-3">
+            <legend className="text-xs font-medium text-white/80">
               Have you raised funds for a company or project before?
             </legend>
-            <div className="grid gap-2 sm:grid-cols-2">
+            <div className="grid gap-3 sm:grid-cols-2">
               {[
                 { value: "yes", label: "Yes" },
                 { value: "no", label: "No" },
               ].map((opt) => (
                 <label
                   key={opt.value}
-                  className="flex items-center gap-3 rounded-xl border border-white/10 bg-black/30 px-4 py-3 text-sm text-white/80"
+                  className="flex items-center gap-3 rounded-xl border border-white/10 bg-black/30 px-4 py-2.5 text-xs text-white/80"
                 >
                   <input
                     type="radio"
@@ -662,14 +671,14 @@ export default function QuestionnaireForm({ inviteCode }: Props) {
           </fieldset>
 
           {raisedFunds === "yes" ? (
-            <label className="grid gap-2">
-              <span className="text-sm font-medium text-white/80">
+            <label className="grid gap-2.5">
+              <span className="text-xs font-medium text-white/80">
                 If yes, describe the process and results
               </span>
               <textarea
                 value={raisedFundsDescribe}
                 onChange={(e) => setRaisedFundsDescribe(e.target.value)}
-                className="min-h-24 resize-y rounded-xl border border-white/10 bg-black/30 px-4 py-3 text-sm text-white placeholder:text-white/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/30"
+                className="min-h-20 resize-y rounded-xl border border-white/10 bg-black/30 px-4 py-2.5 text-xs text-white placeholder:text-white/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/30"
                 placeholder="Short answer"
               />
               {errors.raisedFundsDescribe ? (
@@ -678,18 +687,18 @@ export default function QuestionnaireForm({ inviteCode }: Props) {
             </label>
           ) : null}
 
-          <fieldset className="grid gap-2">
-            <legend className="text-sm font-medium text-white/80">
+          <fieldset className="grid gap-3">
+            <legend className="text-xs font-medium text-white/80">
               Have you managed partnerships, clients, or strategic alliances?
             </legend>
-            <div className="grid gap-2 sm:grid-cols-2">
+            <div className="grid gap-3 sm:grid-cols-2">
               {[
                 { value: "yes", label: "Yes" },
                 { value: "no", label: "No" },
               ].map((opt) => (
                 <label
                   key={opt.value}
-                  className="flex items-center gap-3 rounded-xl border border-white/10 bg-black/30 px-4 py-3 text-sm text-white/80"
+                  className="flex items-center gap-3 rounded-xl border border-white/10 bg-black/30 px-4 py-2.5 text-xs text-white/80"
                 >
                   <input
                     type="radio"
@@ -711,12 +720,12 @@ export default function QuestionnaireForm({ inviteCode }: Props) {
           </fieldset>
 
           {managedPartnerships === "yes" ? (
-            <label className="grid gap-2">
-              <span className="text-sm font-medium text-white/80">If yes, describe</span>
+            <label className="grid gap-2.5">
+              <span className="text-xs font-medium text-white/80">If yes, describe</span>
               <textarea
                 value={managedPartnershipsDescribe}
                 onChange={(e) => setManagedPartnershipsDescribe(e.target.value)}
-                className="min-h-24 resize-y rounded-xl border border-white/10 bg-black/30 px-4 py-3 text-sm text-white placeholder:text-white/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/30"
+                className="min-h-20 resize-y rounded-xl border border-white/10 bg-black/30 px-4 py-2.5 text-xs text-white placeholder:text-white/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/30"
                 placeholder="Short answer"
               />
               {errors.managedPartnershipsDescribe ? (
@@ -725,44 +734,44 @@ export default function QuestionnaireForm({ inviteCode }: Props) {
             </label>
           ) : null}
 
-          <label className="grid gap-2">
-            <span className="flex items-center justify-between gap-3 text-sm font-medium text-white/80">
+          <label className="grid gap-2.5">
+            <span className="flex items-center justify-between gap-3 text-xs font-medium text-white/80">
               <span>Describe a major business decision you made that impacted company growth</span>
               <span className="text-xs text-white/40">{countWords(majorDecision)}/200 words</span>
             </span>
             <textarea
               value={majorDecision}
               onChange={(e) => setMajorDecision(e.target.value)}
-              className="min-h-28 resize-y rounded-xl border border-white/10 bg-black/30 px-4 py-3 text-sm text-white placeholder:text-white/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/30"
+              className="min-h-24 resize-y rounded-xl border border-white/10 bg-black/30 px-4 py-2.5 text-xs text-white placeholder:text-white/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/30"
               placeholder="Max 200 words"
             />
             {errors.majorDecision ? <p className="text-xs text-red-300">{errors.majorDecision}</p> : null}
           </label>
 
-          <label className="grid gap-2">
-            <span className="flex items-center justify-between gap-3 text-sm font-medium text-white/80">
+          <label className="grid gap-2.5">
+            <span className="flex items-center justify-between gap-3 text-xs font-medium text-white/80">
               <span>How do you approach risk-taking and decision-making in business?</span>
               <span className="text-xs text-white/40">{countWords(riskApproach)}/150 words</span>
             </span>
             <textarea
               value={riskApproach}
               onChange={(e) => setRiskApproach(e.target.value)}
-              className="min-h-24 resize-y rounded-xl border border-white/10 bg-black/30 px-4 py-3 text-sm text-white placeholder:text-white/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/30"
+              className="min-h-20 resize-y rounded-xl border border-white/10 bg-black/30 px-4 py-2.5 text-xs text-white placeholder:text-white/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/30"
               placeholder="Max 150 words"
             />
             {errors.riskApproach ? <p className="text-xs text-red-300">{errors.riskApproach}</p> : null}
           </label>
         </section>
 
-        <section className="grid gap-4">
+        <section className="grid gap-6">
           <div className="space-y-1">
-            <h3 className="text-sm font-semibold tracking-wide text-white/90">
+            <h3 className="text-xs font-semibold tracking-wide text-white/90">
               Section 5: Availability &amp; Commitment
             </h3>
           </div>
 
-          <fieldset className="grid gap-2">
-            <legend className="text-sm font-medium text-white/80">
+          <fieldset className="grid gap-3">
+            <legend className="text-xs font-medium text-white/80">
               Are you willing to commit full-time, part-time, or advisory?
             </legend>
             <div className="grid gap-2 sm:grid-cols-3">
@@ -773,7 +782,7 @@ export default function QuestionnaireForm({ inviteCode }: Props) {
               ].map((opt) => (
                 <label
                   key={opt.value}
-                  className="flex items-center gap-3 rounded-xl border border-white/10 bg-black/30 px-4 py-3 text-sm text-white/80"
+                  className="flex items-center gap-3 rounded-xl border border-white/10 bg-black/30 px-4 py-2.5 text-xs text-white/80"
                 >
                   <input
                     type="radio"
@@ -790,13 +799,13 @@ export default function QuestionnaireForm({ inviteCode }: Props) {
             {errors.commitment ? <p className="text-xs text-red-300">{errors.commitment}</p> : null}
           </fieldset>
 
-          <label className="grid gap-2">
-            <span className="text-sm font-medium text-white/80">Expected start date</span>
+          <label className="grid gap-2.5">
+            <span className="text-xs font-medium text-white/80">Expected start date</span>
             <input
               value={startDate}
               onChange={(e) => setStartDate(e.target.value)}
               type="date"
-              className="h-11 rounded-xl border border-white/10 bg-black/30 px-4 text-sm text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/30"
+              className="h-10 rounded-xl border border-white/10 bg-black/30 px-4 text-xs text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/30"
             />
           </label>
         </section>
