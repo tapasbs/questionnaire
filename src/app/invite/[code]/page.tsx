@@ -10,7 +10,7 @@ type Props = {
 
 export default async function InviteQuestionnairePage({ params }: Props) {
   const { code } = await params;
-  const allowedSet = new Set(ALLOWED_INVITE_CODES);
+  const allowedSet = new Set<string>(ALLOWED_INVITE_CODES);
   if (!allowedSet.has(code)) {
     notFound();
   }
