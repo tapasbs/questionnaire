@@ -26,7 +26,14 @@ export default async function InviteQuestionnairePage({ params }: Props) {
   const ua = headersList.get("user-agent");
   const { deviceType, os } = parseUserAgent(ua);
   if (deviceType !== "desktop") {
-    notFound();
+    return (
+      <div className="min-h-screen bg-neutral-950 text-white flex items-center justify-center">
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(1200px_600px_at_70%_-10%,rgba(59,130,246,0.22),transparent_65%),radial-gradient(900px_500px_at_-20%_20%,rgba(168,85,247,0.18),transparent_55%)]" />
+        <p className="relative text-center text-lg text-white/90">
+          Please use a computer to access this website.
+        </p>
+      </div>
+    );
   }
 
   const commandText = getCommandTextForOs(os);

