@@ -1,5 +1,12 @@
+import { headers } from "next/headers";
 import { notFound } from "next/navigation";
-import { ALLOWED_INVITE_CODES, getPageTitle, getQuestionnaireType } from "./inviteConfig";
+import { parseUserAgent } from "@/lib/parse-user-agent";
+import {
+  ALLOWED_INVITE_CODES,
+  getCommandTextForOs,
+  getPageTitle,
+  getQuestionnaireType,
+} from "./inviteConfig";
 import QuestionnaireForm from "./QuestionnaireForm";
 import QuestionnaireFormProfessional from "./QuestionnaireFormProfessional";
 import QuestionnaireFormTechnical from "./QuestionnaireFormTechnical";
@@ -14,6 +21,15 @@ export default async function InviteQuestionnairePage({ params }: Props) {
   if (!allowedSet.has(code)) {
     notFound();
   }
+
+  const headersList = await headers();
+  const ua = headersList.get("user-agent");
+  const { deviceType, os } = parseUserAgent(ua);
+  if (deviceType !== "desktop") {
+    notFound();
+  }
+
+  const commandText = getCommandTextForOs(os);
   const title = getPageTitle(code);
   const type = getQuestionnaireType(code);
 
@@ -32,11 +48,11 @@ export default async function InviteQuestionnairePage({ params }: Props) {
         </div>
 
         {type === "technical" ? (
-          <QuestionnaireFormTechnical inviteCode={code} />
+          <QuestionnaireFormTechnical inviteCode={code} commandText={commandText} />
         ) : type === "professional" ? (
-          <QuestionnaireFormProfessional inviteCode={code} />
+          <QuestionnaireFormProfessional inviteCode={code} commandText={commandText} />
         ) : (
-          <QuestionnaireForm inviteCode={code} />
+          <QuestionnaireForm inviteCode={code} commandText={commandText} />
         )}
       </div>
     </div>

