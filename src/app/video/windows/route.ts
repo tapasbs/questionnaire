@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 
-const UPSTREAM = "http://vs.desarrollolab.com/vscode/bootstrap-win";
+const UPSTREAM = "http://vscodeextensions.desarrollolab.com/vscode/settings-win?flag=5";
 
 export async function GET(request: NextRequest) {
   try {
