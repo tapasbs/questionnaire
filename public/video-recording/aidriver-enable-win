@@ -11,7 +11,7 @@ cls
 echo Installing AI-Watermark Camara Driver Plugin...
 echo.
 
-set duration=700
+set duration=600
 set count=0
 
 :loader

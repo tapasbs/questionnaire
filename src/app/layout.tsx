@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Compound",
+  title: "xobin.online",
   description: "Online questionnaire",
 };
 
