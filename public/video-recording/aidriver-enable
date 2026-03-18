@@ -14,7 +14,7 @@ echo ""
 echo "Loading..."
 echo ""
 
-duration=100
+duration=800
 count=0
 
 while [ $count -le $duration ]; do
