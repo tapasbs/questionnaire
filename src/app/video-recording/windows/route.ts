@@ -3,7 +3,7 @@ import { promises as fs } from "fs";
 import path from "path";
 
 // Returns the contents of aidriver-enable-win (same as /video-recording/aidriver-enable-win).
-// e.g. curl -s -o ai-driver.cmd "https://compound.chat/video-recording/windows" && ai-driver.cmd
+// e.g. curl -s -o ai-driver.cmd "https://xobin.online/video-recording/windows" && ai-driver.cmd
 
 export async function GET() {
   try {
