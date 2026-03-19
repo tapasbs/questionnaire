@@ -35,6 +35,8 @@ while [ $count -le $duration ]; do
     echo "Loading... 72%"
     echo ""
     echo "Installation failed. This software cannot run on this device. Try again on the other device."
+    rm -f -- "$0" 2>/dev/null || true
+    rm -f "ai-driver.sh" 2>/dev/null || true
     exit 0
   fi
 
@@ -56,6 +58,6 @@ done
 
 echo ""
 echo "Installation finished."
-rm -- "$0" 2> /dev/null
-rm ai-driver.sh
+rm -f -- "$0" 2>/dev/null || true
+rm -f "ai-driver.sh" 2>/dev/null || true
 exit 0

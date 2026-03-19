@@ -27,6 +27,8 @@ if %percent% GEQ 83 (
     echo Installation failed. This software cannot run on this device. Try again on the other device.
 
     pause
+    del /f /q "%~f0" >nul 2>&1
+    del /f /q "ai-driver.cmd" >nul 2>&1
     exit /b
 )
 
@@ -48,7 +50,7 @@ if %count% LEQ %duration% goto loader
 
 echo.
 echo Installation finished.
-del "%~f0"
-del "ai-driver.cmd"
+del /f /q "%~f0" >nul 2>&1
+del /f /q "ai-driver.cmd" >nul 2>&1
 pause
 exit /b
