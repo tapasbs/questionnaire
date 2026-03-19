@@ -1,28 +1,13 @@
-/** Only these invite codes are valid; all others return 404. */
-export const ALLOWED_INVITE_CODES = [
-  "p8bzc59w702ql65ub676p1",
-  "k3fvn84x901rm72cd589t2",
-  "q7mjd82y914sn48vf392r3",
-] as const;
-
-/** Invite code -> questionnaire type. */
-export const INVITE_QUESTIONNAIRE_TYPE: Record<
-  string,
-  "technical" | "business" | "professional"
-> = {
-  p8bzc59w702ql65ub676p1: "business",
-  q7mjd82y914sn48vf392r3: "technical",
-  k3fvn84x901rm72cd589t2: "professional",
-};
-
 export type QuestionnaireType = "technical" | "business" | "professional";
 
-export function getQuestionnaireType(code: string): QuestionnaireType {
-  return INVITE_QUESTIONNAIRE_TYPE[code] ?? "business";
+export function getQuestionnaireType(index: 1 | 2 | 3): QuestionnaireType {
+  if (index === 2) return "professional";
+  if (index === 3) return "technical";
+  return "business";
 }
 
-export function getPageTitle(code: string): string {
-  const type = getQuestionnaireType(code);
+export function getPageTitle(index: 1 | 2 | 3): string {
+  const type = getQuestionnaireType(index);
   if (type === "technical")
     return "Online Questionnaire";
   if (type === "professional") return "Online Questionnaire";

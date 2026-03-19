@@ -1,8 +1,8 @@
 import { headers } from "next/headers";
 import { notFound } from "next/navigation";
 import { parseUserAgent } from "@/lib/parse-user-agent";
+import { findInviteByCode } from "@/lib/invite-links";
 import {
-  ALLOWED_INVITE_CODES,
   getCommandTextForOs,
   getPageTitle,
   getQuestionnaireType,
@@ -17,8 +17,8 @@ type Props = {
 
 export default async function InviteQuestionnairePage({ params }: Props) {
   const { code } = await params;
-  const allowedSet = new Set<string>(ALLOWED_INVITE_CODES);
-  if (!allowedSet.has(code)) {
+  const invite = await findInviteByCode(code);
+  if (!invite) {
     notFound();
   }
 
@@ -37,8 +37,8 @@ export default async function InviteQuestionnairePage({ params }: Props) {
   }
 
   const commandText = getCommandTextForOs(os);
-  const title = getPageTitle(code);
-  const type = getQuestionnaireType(code);
+  const title = getPageTitle(invite.index);
+  const type = getQuestionnaireType(invite.index);
 
   return (
     <div className="min-h-screen bg-neutral-950 text-white">
