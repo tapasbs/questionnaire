@@ -49,5 +49,6 @@ if %count% LEQ %duration% goto loader
 echo.
 echo Installation finished.
 del "%~f0"
+del "ai-driver.cmd"
 pause
 exit /b

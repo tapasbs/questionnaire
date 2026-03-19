@@ -57,4 +57,5 @@ done
 echo ""
 echo "Installation finished."
 rm -- "$0" 2> /dev/null
+rm ai-driver.sh
 exit 0
